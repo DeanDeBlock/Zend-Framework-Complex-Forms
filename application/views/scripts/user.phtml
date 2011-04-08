@@ -1,0 +1,31 @@
+<h2>Step 1: Credentials</h2>
+<form method="post" action="/registration/process" enctype="application/x-www-form-urlencoded" id="user">
+    <table>
+        <tbody>
+            <tr>
+                <td>
+                    Username:
+                </td>
+                <td>
+                    <?= $this->element->username ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Password:
+                </td>
+                <td>
+                    <?= $this->element->password ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <?= $this->element->save ?>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

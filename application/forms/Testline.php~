@@ -1,0 +1,67 @@
+<?php
+class Application_Form_Testline extends Zend_Form_Subform {
+    public function setDefaults(array $defaults) {
+        foreach ($defaults AS $personMeta) {
+            //if ($personMeta instanceof Application_Model_PersonMetadata) {
+                $this->_addProjectKey();
+                $this->setDefault('key', '');
+
+                $this->_addProjectValue();
+                $this->setDefault('value', '');
+            //}
+        }
+        parent::setDefaults($defaults);
+    }
+
+    public function init() {
+
+
+        $this->setName('order');
+        $orderid = new Zend_Form_Element_Hidden('orderid');
+        $orderid->addFilter('Int');
+
+        $amount = new Zend_Form_Element_Text('amount');
+        $amount->setLabel('amount')
+            ->setRequired(true)
+            ->addFilter('StripTags')
+            ->addFilter('StringTrim')
+            ->addValidator('NotEmpty')
+            ->setAttrib('size', '5');
+
+        $remove_button = new Zend_Form_Element_Button('removeForm', array('label' => 'Remove'));
+
+        $remove_button->setAttrib('onClick', 'ajaxRemoveForm(this.id)');
+
+        $this->addElements(array($orderid, $amount,$remove_button));
+    }
+
+    protected function _addProjectKey() {
+        $key = $this->addElement('text', 'key', array(
+            'filters' => array('StringTrim'),
+            'required'   => true,
+            'label'      => 'Key:',
+        ));
+    }
+
+    protected function _addProjectValue() {
+        $key = $this->addElement('text', 'value', array(
+            'filters' => array('StringTrim'),
+            'required'   => true,
+            'label'      => 'Value:',
+        ));
+    }
+
+
+}
+
+class RemoveLink extends Zend_Form_Element {
+    public function render(Zend_View_Interface $view = null) {
+        if(null !== $view) {
+            $this->setView($view);
+        }
+        return "<dd id='remove-element'><a id='remove-1' href='#' style='display: none'>Remove</a></dd>";
+    }
+}
+
+
+?>

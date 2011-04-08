@@ -1,0 +1,44 @@
+<?php
+$this->headMeta()->appendHttpEquiv('Content-Type', 'text/html;charset=utf-8');
+echo $this->doctype(); ?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <script type="text/JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+        <link href="/css/site.css" media="screen" rel="stylesheet" type="text/css" >
+        <title>Zend Framework - Complex Forms Example</title>
+        <script type="text/JavaScript">
+            $(document).ready(function(){
+
+                $("#default-label").hide();
+                $("#default-element").hide();
+
+                var counter = parseInt($("#counter").val());
+
+                $("#omg").click(function(){
+
+                    var newEl = $('#fieldset-default > dl').clone();
+                    $("#base-label", newEl).attr("id", "new" + counter + "-label");
+                    $("#base-element", newEl).attr("id", "new" + counter + "-element");
+                    $("#fieldset-base", newEl).attr("id", "fieldset-new" + counter);
+
+                    $("#data-default-base-email-label > label", newEl).attr("for", "data-new-" + counter + "-email");
+                    $("#data-default-base-email-element> input", newEl).attr("id", "data-new-" + counter + "-email");
+                    $("#data-default-base-email-element> input", newEl).attr("name", "data[new][" + counter + "][email]");
+
+                    $(newEl).children().each(
+                    function(i, e) {
+                        $(e).appendTo("#fieldset-new > dl");
+                    }
+                );
+
+                    $("#counter").val(++counter);
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="container">
+            <?php echo $this->layout()->content; ?>
+        </div>
+    </body>
+</html>

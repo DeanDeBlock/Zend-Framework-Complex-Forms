@@ -1,0 +1,61 @@
+<?#Zend_Debug::dump($this->element)?>
+<h2>Step 2: Enter user data</h2>
+<form method="post" action="/registration/process" enctype="application/x-www-form-urlencoded" id="data">
+    <table>
+        <tbody>
+            <tr>
+                <td>
+                    Firstname:
+                </td>
+                <td>
+                    <?= $this->element->firstName ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Lastname:
+                </td>
+                <td>
+                    <?= $this->element->lastName ?>
+                </td>
+            </tr>
+            <tr><td style="border-bottom: 1px solid #aaa;padding: 20px;"></td><td style="border-bottom: 1px solid #aaa"></td></tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <?= $this->element->id ?>
+                    <?= $this->element->default ?>
+                    <?= $this->element->metadata ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <?= $this->element->new ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <?= $this->element->button ?>
+                </td>
+            </tr>
+            <tr><td style="border-bottom: 1px solid #aaa;padding: 20px;"></td><td style="border-bottom: 1px solid #aaa"></td></tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <?= $this->element->save ?>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+<?# Zend_Debug::dump($this->element->default)?>

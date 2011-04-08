@@ -1,0 +1,28 @@
+<?php
+$this->headMeta()->appendHttpEquiv('Content-Type', 'text/html;charset=utf-8');
+echo $this->doctype(); ?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <?php echo $this->headMeta(); ?>
+        <?php echo $this->headTitle(); ?>
+        <script type="text/javascript" src="<?=$this->baseUrl()?>/javascript/jquery-1.4.1.min.js"></script>
+		  <link href="/css/site.css" media="screen" rel="stylesheet" type="text/css" >         
+        <?php echo $this->headScript(); ?>
+    </head>
+    <body class="report_body">
+        <div id="container">
+            <div id="content">
+                <div id="main_content">
+                    <div style="padding: 7px;">
+                        <!-- hier komt de content -->
+                        <div id="content">
+                            <?php echo $this->layout()->content; ?>
+                        </div>
+                    </div>
+                </div>
+                <div id="main_context">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

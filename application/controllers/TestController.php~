@@ -1,0 +1,234 @@
+<?php
+require_once(APPLICATION_PATH.'/forms/ObjectPartial.php');
+
+class TestController extends Zend_Controller_Action {
+    protected $_form;
+    protected $_namespace = 'TestController';
+    protected $_session;
+
+    /**
+     * Gets the add/edit form for the current object
+     *
+     * @access public
+     * @return object|void
+     * @param boolean $search_form Set to true if you want the search form object to be returned
+     */
+    public function getForm()
+    {
+        if (null === $this->_form) {
+        	$action = $this->getRequest()->getActionName();
+        	$this->_form = new Application_Form_Test();
+
+        }
+        return $this->_form;
+    }
+
+    /**
+     * Action for the new page
+     *
+     * @access public
+     * @return void
+     */
+    public function newAction (){
+
+
+        //Store the parent object in a session, this way we can use the var in the 3th form step
+        $this->getSessionNamespace();
+
+        // Either re-display the current page, or grab the "next"
+        // (first) sub form
+        if (!$form = $this->getCurrentSubForm()) {
+            $form = $this->getNextSubForm();
+        }
+
+        $this->view->form = $this->getForm()->prepareSubForm($form);
+
+    }
+
+     /**
+     * Action to process the multi step form
+     *
+     * @access public
+     * @return mixed
+     */
+    public function processAction(){
+
+        //No form is set
+        if (!$form = $this->getCurrentSubForm()) {
+            return $this->_forward('new');
+        }
+
+        if (!$this->subFormIsValid($form, $this->getRequest()->getPost())) {
+            $this->view->form = $this->getForm()->prepareSubForm($form);
+            return $this->render('new');
+        }
+
+        if (!$this->formIsValid()) {
+            $form = $this->getNextSubForm();
+            $this->view->form = $this->getForm()->prepareSubForm($form);
+            return $this->render('new');
+        }
+
+        // Valid form!
+        // Let's save everything
+        //......
+
+        // All done, clear the sessions
+        Zend_Session::namespaceUnset($this->_namespace);
+        //$this->render('index');
+        $this->_forward('index');
+    }
+
+	/**
+	 * Ajax action that returns the dynamic form field for step3 in the form
+	 */
+	public function newajaxformAction() {
+
+	  if(!$this->getRequest()->isXmlHttpRequest()) throw new Zend_Controller_Action_Exception("This isn't a Ajax request !", 404);
+
+	  $ajaxContext = $this->_helper->getHelper('AjaxContext');
+	  $ajaxContext->addActionContext('newfield', 'html')->initContext();
+
+	  //Disable view
+	  $this->_helper->viewRenderer->setNoRender();
+      $this->_helper->layout()->disableLayout();
+
+	  $id = $this->_getParam('id', null);
+	  $amount = $this->_getParam('amount', null);
+
+	  $fieldsKeys = $_POST['key'];
+	  $fieldsValues = $_POST['value'];
+
+	  //This one adds multiple objects on one page
+	  $po = new Test_Partial($id,$amount,$fieldsKeys,$fieldsValues);
+
+	  echo $po->__toString();
+	}
+
+    /**
+     * Get the session namespace we're using
+     *
+     * @access public
+     * @return Zend_Session_Namespace
+     */
+    public function getSessionNamespace()
+    {
+        if (null === $this->_session) {
+            $this->_session = new Zend_Session_Namespace($this->_namespace);
+        }
+
+        return $this->_session;
+    }
+
+    /**
+     * Get a list of forms already stored in the session
+     *
+     * @access public
+     * @return array
+     */
+    public function getStoredForms()
+    {
+        $stored = array();
+        foreach ($this->getSessionNamespace() as $key => $value) {
+            $stored[] = $key;
+        }
+
+        return $stored;
+    }
+
+    /**
+     * Get list of all subforms available
+     *
+     * @access public
+     * @return array
+     */
+    public function getPotentialForms()
+    {
+        return array_keys($this->getForm()->getSubForms());
+    }
+
+    /**
+     * What sub form was submitted?
+     *
+     * @access public
+     * @return false|Zend_Form_SubForm
+     */
+    public function getCurrentSubForm()
+    {
+        $request = $this->getRequest();
+        if (!$request->isPost()) {
+            return false;
+        }
+
+        foreach ($this->getPotentialForms() as $name) {
+            if ($data = $request->getPost($name, false)) {
+                if (is_array($data)) {
+                    return $this->getForm()->getSubForm($name);
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the next sub form to display
+     *
+     * @return Zend_Form_SubForm|false
+     * @access public
+     */
+    public function getNextSubForm()
+    {
+        $storedForms    = $this->getStoredForms();
+        $potentialForms = $this->getPotentialForms();
+
+        foreach ($potentialForms as $name) {
+            if (!in_array($name, $storedForms)) {
+                return $this->getForm()->getSubForm($name);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Is the sub form valid?
+     *
+     * @param  Zend_Form_SubForm $subForm
+     * @param  array $data
+     * @return bool
+     */
+    public function subFormIsValid(Zend_Form_SubForm $subForm,array $data)
+    {
+        $name = $subForm->getName();
+
+        echo '<br />Submitted data(Send from Controller) = <pre>';
+        	print_r($data);
+        echo '</pre>';
+
+        if ($subForm->isValid($data)) {
+            $this->getSessionNamespace()->$name = $subForm->getValues();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Is the full form valid?
+     *
+     * @return bool
+     * @access public
+     */
+    public function formIsValid()
+    {
+        $data = array();
+        foreach ($this->getSessionNamespace() as $key => $info) {
+            $data[$key] = $info[$key];
+        }
+
+        return (count($this->getStoredForms()) < count($this->getPotentialForms()))? false : $this->getForm()->isValid($data);
+    }
+}
+?>

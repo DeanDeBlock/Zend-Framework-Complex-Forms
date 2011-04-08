@@ -1,0 +1,76 @@
+<?php
+ 
+class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
+	protected function _initAutoload()
+    {
+    	/* 
+    	 * If you don't register namespace
+    	 * You will get error :
+    	 * Fatal error: Class 'Example_Controller_Plugin_Param' not found in
+    	 * ...\library\Zend\Application\Resource\Frontcontroller.php on line 92
+    	 *
+    	 */
+
+    	$autoloader = Zend_Loader_Autoloader::getInstance();
+        $autoloader->registerNamespace('My_');
+        $autoloader->registerNamespace('Bvb_');
+        $autoloader->suppressNotFoundWarnings(true);
+
+        /*
+         * also you will get Exception :
+         * No entry is registered for key 'Zend_Request_Example'
+         * called in helper ParamHelper.php
+         *
+         */
+
+    }
+
+    protected function _initPlugins() {
+    //$front = Zend_Controller_Front::getInstance();
+    //$front->registerPlugin(new Application_Plugin_Sidebar());
+//        $sessName = "PHPSESSID";
+//        $sessOptions = array('name' => $sessName);
+//
+//        // Flash has problems with cookies so we pass the PHPSESSID variable via get
+//        // it'll be injected if it doesn't exist in _SERVER["HTTP_COOKIE"] e.g. '; PHPSESSID=hdi5u83hfnu7ltlvp5q3bb53k4'
+//        if ((stripos($_SERVER['REQUEST_URI'], '__tkn') !== false)
+//            //    &amp;&amp; preg_match('#^[a-z\d]{25,32}$#si', $_GET[$sessName])
+//            && preg_match('#__tkn/([a-z\d]{25,32})#si', $_SERVER['REQUEST_URI'], $matches)
+//            && (stripos($_SERVER["HTTP_COOKIE"], $matches[1]) === false)) {
+//            $sid = $matches[1];
+//
+//            $prefix = '';
+//            if (!empty($_SERVER["HTTP_COOKIE"])) {
+//                $prefix = '; ';
+//            }
+//
+//            $_SERVER["HTTP_COOKIE"] .= $prefix . $sessName . '=' . $sid;
+//            $_COOKIE[$sessName] = $sid;
+//
+//            Zend_Session::setId($sid);
+//        }
+//
+//        Zend_Session::setOptions($sessOptions);
+
+        $loader = new Zend_Loader_Autoloader_Resource (array (
+            'basePath' => APPLICATION_PATH,
+            'namespace' => 'Application',
+        ));
+
+        $loader -> addResourceType ( 'model', 'models', 'Model');
+        $loader -> addResourceType ( 'form', 'forms', 'Form');
+        $loader -> addResourceType ( 'mapper', 'mappers', 'Mapper');
+
+
+    }
+
+    function _initViewHelpers() {
+        $this->bootstrap('layout');
+        $layout = $this->getResource('layout');
+        $view = $layout->getView();
+
+        ZendX_JQuery::enableView($view);
+    }
+
+}
+

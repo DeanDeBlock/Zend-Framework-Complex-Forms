@@ -1,0 +1,64 @@
+<?php
+class Application_Form_Test extends Zend_Form {
+    public function isValid($data) {
+        $subform = $this->getSubForm('new');
+        // make sure new is array (won't be in $data if nothing submitted)
+        if (!isset($data['new'])) {
+            $data['new'] = array();
+        }
+        foreach ($data['new'] as $idx => $values) {
+            $testline = new Application_Form_Testline();
+            $subform->addSubForm($testline, (string) $idx);
+        }
+        // call parent, which will populate newly created elements.
+        return parent::isValid($data);
+    }
+
+    public function init() {
+        $hiddenId = $this->addElement('hidden', 'id', array(
+            'id' => 'counter',
+            'value' => 1,
+            'ignore' => true,
+        ));
+
+        $hiddenId->removeDecorator('label');
+        $hiddenId->removeDecorator('HtmlTag');
+        $hiddenId->removeDecorator('DtDdWrapper');
+
+        $this->addSubForm(new Zend_Form_SubForm(),'new');
+
+        $this->addSubForm(new Zend_Form_SubForm(), 'default');
+
+        $subform = new Application_Form_Testline();
+
+        $this->default->addSubForm($subform, "base");
+
+        $this->addElement('submit', 'submit', array(
+            'required' => false,
+            'ignore'   => true,
+            'label'    => 'Save and continue',
+            'order' => 99993
+        ));
+
+        // Add a remove and add button for the dynamic forms
+        $this->addElement('text', 'addFormAmount', array('label' => '',
+        												'required' => false,
+        												'ignore'=> true,
+        												'value'        => 1,
+        												'description'  => 'objects.',
+    			     									'order' => 99992
+  		));
+
+        $this->addElement('button', 'addForm', array('label' => 'Add',
+    			     									'order' => 99991
+  		));
+
+  		$this->getElement('addForm')->setAttrib('onClick', 'ajaxAddForm();');
+    }
+
+    public function addme($id) {
+        $metadata = $this->getSubForm('testline');
+        $subform = new Application_Form_Testline();
+        $metadata->addSubForm($subform, (string) $id);
+    }
+}
